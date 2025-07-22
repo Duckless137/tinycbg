@@ -6,3 +6,6 @@ exclude = ["tests/patterns/**", "images/"]
 description = "A tiny crate for working with ULTRAKILL's Cybergrind Patterns programatically."
 keywords = ["ultrakill", "cybergrind"]
 repository = "https://github.com/Duckless137/tinycbg"
+readme = "README.md"
+license = "MIT"
+license-file = "LICENSE.md"

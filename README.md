@@ -13,3 +13,4 @@ for small things simply send a pull request. Thank you!
 
 # Credits
 Slab revolver art by [NoPlagueHere](https://www.deviantart.com/noplaguehere/art/Ultrakill-Slab-Revolver-1086688965)
+Published under the [MIT license](/LICENSE.md)
