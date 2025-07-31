@@ -27,10 +27,10 @@ pub mod error {
     /// trying to parse invalid data
     #[derive(PartialEq, Clone)]
     pub struct ParseError {
-        pub line: usize,
-        pub column: usize,
-        pub char: u8,
+        pub line: u32,
+        pub column: u32,
         pub kind: ParseErrorType,
+        pub char: u8,
     }
 
     #[derive(Clone, Debug, PartialEq)]
