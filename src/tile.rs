@@ -59,7 +59,8 @@ impl TryFrom<u8> for Prefab {
 /// Contains a height anywhere between
 /// -50 and 50, and an optional prefab.
 /// ```should_panic
-/// tinycbg::Tile::new(51, Prefab::None());
+/// use tinycbg::Prefab;
+/// tinycbg::Tile::new(51, Prefab::None);
 /// ```
 #[derive(Default, Clone, Copy, PartialEq)]
 pub struct Tile {

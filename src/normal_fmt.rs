@@ -4,7 +4,7 @@ use crate::{
 };
 use std::{
     fs::File,
-    io::{self, Read, Write},
+    io::{self, BufReader, BufWriter, Read, Write},
     path::Path,
 };
 
@@ -75,7 +75,96 @@ impl CyberGrindPattern {
             buf_idx += 1;
         }
 
-        file.write_all(&buf[..buf_idx])
+        let mut writer = BufWriter::new(file);
+
+        writer.write_all(&buf[..buf_idx])
+    }
+
+    fn check_for_newline(line: u32, column: u32, byte: u8) -> Result<(), ParseError> {
+        if byte != b'\n' {
+            Err(ParseError {
+                line,
+                column,
+                char: byte,
+                kind: ParseErrorType::ExpectedNewline,
+            })
+        } else {
+            Ok(())
+        }
+    }
+
+    // Returns:
+    // - height
+    // - new column idx
+    // - increased buf_idx
+    fn parse_parentheses(
+        bytes: &[u8],
+        buf_idx: usize,
+        line: u32,
+        column: u32,
+    ) -> Result<(i8, u32, usize), ParseError> {
+        let mut is_negative = false;
+        let mut height: i8 = 0;
+        let mut buf_idx = buf_idx;
+
+        let mut column = column + 1;
+        buf_idx += 1;
+        let mut char = bytes[buf_idx];
+
+        while char != b')' {
+            if char == b'-' {
+                if is_negative {
+                    return Err(ParseError {
+                        line,
+                        column,
+                        char,
+                        kind: ParseErrorType::DuplicateNegative,
+                    });
+                } else {
+                    is_negative = true;
+                }
+            } else {
+                if !(48..=57).contains(&char) {
+                    return Err(ParseError {
+                        line,
+                        column,
+                        char,
+                        kind: ParseErrorType::InvalidHeightChar,
+                    });
+                }
+
+                if char == 48 && height == 0 {
+                    return Err(ParseError {
+                        line,
+                        column,
+                        char,
+                        kind: ParseErrorType::LeadingZero,
+                    });
+                }
+
+                height *= 10;
+                height += char as i8 - 48;
+            }
+
+            column += 1;
+            buf_idx += 1;
+            char = bytes[buf_idx];
+        }
+
+        if is_negative {
+            height *= -1;
+        }
+
+        if !(-50..=50).contains(&height) {
+            return Err(ParseError {
+                line,
+                column,
+                char,
+                kind: ParseErrorType::InvalidHeightValue,
+            });
+        }
+
+        Ok((height, column, buf_idx))
     }
 
     /// Takes in a series of bytes and tries
@@ -85,73 +174,17 @@ impl CyberGrindPattern {
 
         let mut pat_idx = 0;
         let mut buf_idx = 0;
-        let mut char = 0;
         let mut line = 1;
+        let mut char;
 
         for _row in 0..16 {
             let mut column = 1;
             for _column in 0..16 {
                 char = bytes[buf_idx];
                 if char == b'(' {
-                    let mut is_negative = false;
-                    let mut height: i8 = 0;
-
-                    column += 1;
-                    buf_idx += 1;
-                    char = bytes[buf_idx];
-
-                    while char != b')' {
-                        if char == b'-' {
-                            if is_negative {
-                                return Err(ParseError {
-                                    line,
-                                    column,
-                                    char,
-                                    kind: ParseErrorType::DuplicateNegative,
-                                });
-                            } else {
-                                is_negative = true;
-                            }
-                        } else {
-                            if !(48..=57).contains(&char) {
-                                return Err(ParseError {
-                                    line,
-                                    column,
-                                    char,
-                                    kind: ParseErrorType::InvalidHeightChar,
-                                });
-                            }
-
-                            if char == 48 && height == 0 {
-                                return Err(ParseError {
-                                    line,
-                                    column,
-                                    char,
-                                    kind: ParseErrorType::LeadingZero,
-                                });
-                            }
-
-                            height *= 10;
-                            height += char as i8 - 48;
-                        }
-
-                        column += 1;
-                        buf_idx += 1;
-                        char = bytes[buf_idx];
-                    }
-
-                    if is_negative {
-                        height *= -1;
-                    }
-
-                    if !(-50..=50).contains(&height) {
-                        return Err(ParseError {
-                            line,
-                            column,
-                            char,
-                            kind: ParseErrorType::InvalidHeightValue,
-                        });
-                    }
+                    let height;
+                    (height, column, buf_idx) =
+                        Self::parse_parentheses(bytes, buf_idx, line, column)?;
 
                     pattern[pat_idx].set_height(height);
                 } else {
@@ -171,27 +204,13 @@ impl CyberGrindPattern {
                 buf_idx += 1;
             }
 
-            if bytes[buf_idx] != b'\n' {
-                return Err(ParseError {
-                    line,
-                    column,
-                    char,
-                    kind: ParseErrorType::ExpectedNewline,
-                });
-            }
+            Self::check_for_newline(line, column, bytes[buf_idx])?;
             buf_idx += 1;
 
             line += 1;
         }
 
-        if bytes[buf_idx] != b'\n' {
-            return Err(ParseError {
-                line,
-                column: 1,
-                char,
-                kind: ParseErrorType::ExpectedNewline,
-            });
-        }
+        Self::check_for_newline(line, 1, bytes[buf_idx])?;
 
         buf_idx += 1;
         line += 1;
@@ -219,14 +238,7 @@ impl CyberGrindPattern {
                 buf_idx += 1;
             }
 
-            if bytes[buf_idx] != b'\n' {
-                return Err(ParseError {
-                    line,
-                    column: 17,
-                    char,
-                    kind: ParseErrorType::ExpectedNewline,
-                });
-            }
+            Self::check_for_newline(line, 17, bytes[buf_idx])?;
             buf_idx += 1;
 
             line += 1;
@@ -245,7 +257,8 @@ impl CyberGrindPattern {
     /// it as a Cybergrind pattern.
     pub fn parse_file(file: &mut File) -> Result<CyberGrindPattern, IoError> {
         let mut buf = Box::new([0; MAX_FILE_SIZE]);
-        let bytes_read = match file.read(buf.as_mut()) {
+        let mut reader = BufReader::new(file);
+        let bytes_read = match reader.read(buf.as_mut()) {
             Ok(bytes_read) => bytes_read,
             Err(err) => return Err(IoError::Io(err)),
         };
