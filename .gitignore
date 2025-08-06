@@ -1,3 +1,4 @@
 /target
 /images/*.xcf
 /*.log
+/test.cgp
