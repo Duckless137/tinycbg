@@ -25,7 +25,7 @@ pub mod error {
 
     /// Error type which is returned when
     /// trying to parse invalid data
-    #[derive(PartialEq, Clone)]
+    #[derive(PartialEq, Clone, Debug)]
     pub struct ParseError {
         pub line: u32,
         pub column: u32,
@@ -61,21 +61,10 @@ pub mod error {
 
     impl Display for IoError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self)
+            write!(f, "{self:?}")
         }
     }
     impl Display for ParseError {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self)
-        }
-    }
-    impl Display for ParseErrorType {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            write!(f, "{:?}", self)
-        }
-    }
-
-    impl Debug for ParseError {
         fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
             let kind_str = match self.kind {
                 ParseErrorType::ExpectedNewline => "Expected newline but got",
@@ -101,6 +90,11 @@ pub mod error {
                     self.line, self.column, kind_str, self.char
                 ),
             }
+        }
+    }
+    impl Display for ParseErrorType {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            write!(f, "{self:?}")
         }
     }
 
