@@ -111,7 +111,7 @@ pub mod error {
                 kind: super::ParseErrorType::DuplicateNegative,
             };
 
-            let dbg_str = format!("{mock_err_height:?}");
+            let dbg_str = format!("{mock_err_height}");
             assert_eq!(
                 dbg_str,
                 "Error parsing line 1, column 3: Duplicate negative symbol \"-\""
@@ -124,7 +124,7 @@ pub mod error {
                 kind: super::ParseErrorType::InvalidPrefab,
             };
 
-            let dbg_str = format!("{mock_err_height:?}");
+            let dbg_str = format!("{mock_err_height}");
             assert_eq!(
                 dbg_str,
                 "Error parsing line 1, column 3: Invalid prefab character \"g\""
@@ -140,7 +140,7 @@ pub mod error {
                 kind: super::ParseErrorType::ExpectedNewline,
             };
 
-            let dbg_str = format!("{mock_err_height:?}");
+            let dbg_str = format!("{mock_err_height}");
             assert_eq!(
                 dbg_str,
                 "Error parsing line 1, column 3: Expected newline but got 0x0b"
@@ -153,7 +153,7 @@ pub mod error {
                 kind: super::ParseErrorType::InvalidHeightChar,
             };
 
-            let dbg_str = format!("{mock_err_height:?}");
+            let dbg_str = format!("{mock_err_height}");
             assert_eq!(
                 dbg_str,
                 "Error parsing line 1, column 3: Invalid height char 0x0b"
