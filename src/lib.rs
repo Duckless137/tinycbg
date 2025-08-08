@@ -1,13 +1,8 @@
+mod indexing;
 mod normal_fmt;
 mod tile;
 pub use tile::Prefab;
 pub use tile::Tile;
-
-use std::ops::Index;
-use std::ops::IndexMut;
-use std::ops::Range;
-use std::ops::RangeFull;
-
 pub mod error {
     use std::{
         error::Error,
@@ -271,89 +266,6 @@ impl CyberGrindPattern {
     pub fn copy_tile_to_column(&mut self, tile: Tile, column: usize) {
         for i in 0..16 {
             self[i * 16 + column] = tile;
-        }
-    }
-}
-
-impl Index<usize> for CyberGrindPattern {
-    type Output = Tile;
-    fn index(&self, index: usize) -> &Self::Output {
-        &self.tiles[index]
-    }
-}
-
-impl IndexMut<usize> for CyberGrindPattern {
-    fn index_mut(&mut self, index: usize) -> &mut Tile {
-        &mut self.tiles[index]
-    }
-}
-
-impl Index<(usize, usize)> for CyberGrindPattern {
-    type Output = Tile;
-    fn index(&self, coordinate: (usize, usize)) -> &Self::Output {
-        let index = coordinate.1 * 16 + coordinate.0;
-        &self.tiles[index]
-    }
-}
-
-impl IndexMut<(usize, usize)> for CyberGrindPattern {
-    fn index_mut(&mut self, coordinate: (usize, usize)) -> &mut Tile {
-        let index = coordinate.1 * 16 + coordinate.0;
-        &mut self.tiles[index]
-    }
-}
-
-impl Index<Range<usize>> for CyberGrindPattern {
-    type Output = [Tile];
-    fn index(&self, range: Range<usize>) -> &Self::Output {
-        &self.tiles[range]
-    }
-}
-
-impl IndexMut<Range<usize>> for CyberGrindPattern {
-    fn index_mut(&mut self, range: Range<usize>) -> &mut [Tile] {
-        &mut self.tiles[range]
-    }
-}
-
-impl Index<RangeFull> for CyberGrindPattern {
-    type Output = [Tile];
-    fn index(&self, range: RangeFull) -> &Self::Output {
-        &self.tiles[range]
-    }
-}
-
-impl IndexMut<RangeFull> for CyberGrindPattern {
-    fn index_mut(&mut self, range: RangeFull) -> &mut [Tile] {
-        &mut self.tiles[range]
-    }
-}
-
-pub struct CyberGrindPatternIter<'a> {
-    tiles: &'a [Tile; 256],
-    idx: usize,
-}
-
-impl<'a> IntoIterator for &'a CyberGrindPattern {
-    type Item = Tile;
-    type IntoIter = CyberGrindPatternIter<'a>;
-    fn into_iter(self) -> Self::IntoIter {
-        CyberGrindPatternIter {
-            tiles: &self.tiles,
-            idx: 0,
-        }
-    }
-}
-
-impl<'a> Iterator for CyberGrindPatternIter<'a> {
-    type Item = Tile;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.idx < 256 {
-            let idx = self.idx;
-            self.idx += 1;
-            Some(self.tiles[idx])
-        } else {
-            None
         }
     }
 }
