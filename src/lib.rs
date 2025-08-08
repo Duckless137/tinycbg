@@ -1,4 +1,5 @@
 mod indexing;
+mod iter;
 mod normal_fmt;
 mod tile;
 pub use tile::Prefab;
