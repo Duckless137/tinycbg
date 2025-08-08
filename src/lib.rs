@@ -1,3 +1,4 @@
+mod iter;
 mod normal_fmt;
 mod tile;
 pub use tile::Prefab;
@@ -326,34 +327,5 @@ impl Index<RangeFull> for CyberGrindPattern {
 impl IndexMut<RangeFull> for CyberGrindPattern {
     fn index_mut(&mut self, range: RangeFull) -> &mut [Tile] {
         &mut self.tiles[range]
-    }
-}
-
-pub struct CyberGrindPatternIter<'a> {
-    tiles: &'a [Tile; 256],
-    idx: usize,
-}
-
-impl<'a> IntoIterator for &'a CyberGrindPattern {
-    type Item = Tile;
-    type IntoIter = CyberGrindPatternIter<'a>;
-    fn into_iter(self) -> Self::IntoIter {
-        CyberGrindPatternIter {
-            tiles: &self.tiles,
-            idx: 0,
-        }
-    }
-}
-
-impl<'a> Iterator for CyberGrindPatternIter<'a> {
-    type Item = Tile;
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.idx < 256 {
-            let idx = self.idx;
-            self.idx += 1;
-            Some(self.tiles[idx])
-        } else {
-            None
-        }
     }
 }
