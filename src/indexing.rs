@@ -72,7 +72,7 @@ fn draw_line(point_a: Point, point_b: Point, buf: &mut [u8; 16]) -> usize {
         *item = idx as u8;
     }
 
-    gcd
+    gcd + 1
 }
 
 impl CyberGrindPattern {
@@ -91,11 +91,11 @@ impl CyberGrindPattern {
             Bound::Excluded(point) => *point,
         };
 
-        assert!(point_a.0 < 8, "X value of lower bound is out of range!");
-        assert!(point_a.1 < 8, "Y value of lower bound is out of range!");
+        assert!(point_a.0 < 16, "X value of lower bound is out of range!");
+        assert!(point_a.1 < 16, "Y value of lower bound is out of range!");
 
-        assert!(point_b.0 < 8, "X value of upper bound is out of range!");
-        assert!(point_b.1 < 8, "Y value of upper bound is out of range!");
+        assert!(point_b.0 < 16, "X value of upper bound is out of range!");
+        assert!(point_b.1 < 16, "Y value of upper bound is out of range!");
 
         let mut line = Line {
             data: self,
@@ -148,6 +148,7 @@ impl<'a> Iterator for Line<'a> {
         }
 
         let idx = self.buf[self.idx as usize] as usize;
+        self.idx += 1;
         let ptr = self.data as *mut CyberGrindPattern;
         // Oh my god why
         unsafe { Some(&mut *(ptr as *mut Tile).add(idx)) }
