@@ -258,24 +258,14 @@ impl CyberGrindPattern {
     pub fn parse_file(file: &mut File) -> Result<CyberGrindPattern, IoError> {
         let mut buf = Box::new([0; MAX_FILE_SIZE]);
         let mut reader = BufReader::new(file);
-        let bytes_read = match reader.read(buf.as_mut()) {
-            Ok(bytes_read) => bytes_read,
-            Err(err) => return Err(IoError::Io(err)),
-        };
-        match Self::parse(&buf[..bytes_read]) {
-            Ok(pat) => Ok(pat),
-            Err(e) => Err(IoError::Parse(e)),
-        }
+        let bytes_read = reader.read(buf.as_mut())?;
+        Ok(Self::parse(&buf[..bytes_read])?)
     }
 
     /// Tries to open a file at path `path` and reads
     /// it as a Cybergrind Patter.
     pub fn parse_path<P: AsRef<Path>>(path: P) -> Result<CyberGrindPattern, IoError> {
-        let mut file = match File::open(path) {
-            Ok(file) => file,
-            Err(err) => return Err(IoError::Io(err)),
-        };
-
+        let mut file = File::open(path)?;
         Self::parse_file(&mut file)
     }
 }
