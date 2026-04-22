@@ -10,6 +10,14 @@ use std::ops::IndexMut;
 use std::ops::Range;
 use std::ops::RangeFull;
 
+pub const MAX_FILE_SIZE: usize = 1569;
+pub mod prelude {
+    pub use crate::error::IoError;
+    pub use crate::error::ParseError;
+    pub use crate::error::ParseErrorType;
+    pub use crate::CyberGrindPattern;
+}
+
 impl Default for CyberGrindPattern {
     fn default() -> Self {
         CyberGrindPattern {

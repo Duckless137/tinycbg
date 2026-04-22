@@ -1,14 +1,12 @@
 use crate::{
     error::{IoError, ParseError, ParseErrorType},
-    CyberGrindPattern, Prefab,
+    CyberGrindPattern, Prefab, MAX_FILE_SIZE,
 };
 use std::{
     fs::File,
     io::{self, BufReader, BufWriter, Read, Write},
     path::Path,
 };
-
-const MAX_FILE_SIZE: usize = 1569;
 
 impl CyberGrindPattern {
     /// Creates a new file at path `path`. If one already exists,
