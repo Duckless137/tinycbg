@@ -23,13 +23,11 @@ impl CyberGrindPattern {
     pub fn write(&self, file: &mut File) -> Result<(), io::Error> {
         let mut buf = Box::new([0; MAX_FILE_SIZE]);
         let mut buf_idx = 0;
-
         let mut tile_idx = 0;
         for _row in 0..16 {
             for _column in 0..16 {
                 let tile = self.tiles[tile_idx];
                 let height = tile.height();
-
                 // Actually sobbing right now
                 if (0..9).contains(&height) {
                     buf[buf_idx] = (height + 48) as u8;
@@ -171,7 +169,6 @@ impl CyberGrindPattern {
     /// to turn them into a Cybergrind Pattern.
     pub fn parse(bytes: &[u8]) -> Result<CyberGrindPattern, ParseError> {
         let mut pattern = CyberGrindPattern::new();
-
         let mut pat_idx = 0;
         let mut buf_idx = 0;
         let mut line = 1;
@@ -206,7 +203,6 @@ impl CyberGrindPattern {
 
             Self::check_for_newline(line, column, bytes[buf_idx])?;
             buf_idx += 1;
-
             line += 1;
         }
 
@@ -214,13 +210,11 @@ impl CyberGrindPattern {
 
         buf_idx += 1;
         line += 1;
-
         pat_idx = 0;
 
         for _row in 0..16 {
             for column in 1..17 {
                 char = bytes[buf_idx];
-
                 let prefab = match Prefab::try_from(char) {
                     Ok(prefab) => prefab,
                     Err(kind) => {
@@ -232,15 +226,12 @@ impl CyberGrindPattern {
                         })
                     }
                 };
-
                 pattern[pat_idx].set_prefab(prefab);
                 pat_idx += 1;
                 buf_idx += 1;
             }
-
             Self::check_for_newline(line, 17, bytes[buf_idx])?;
             buf_idx += 1;
-
             line += 1;
         }
 
@@ -248,13 +239,13 @@ impl CyberGrindPattern {
     }
 
     /// Takes in a string and tries to turn it into
-    /// a Cybergrind pattern.
+    /// a Cybergrind Pattern.
     pub fn parse_str(string: &str) -> Result<CyberGrindPattern, ParseError> {
         Self::parse(string.as_bytes())
     }
 
     /// Takes in a string and tries to read
-    /// it as a Cybergrind pattern.
+    /// it as a Cybergrind Pattern.
     pub fn parse_file(file: &mut File) -> Result<CyberGrindPattern, IoError> {
         let mut buf = Box::new([0; MAX_FILE_SIZE]);
         let mut reader = BufReader::new(file);
@@ -263,7 +254,7 @@ impl CyberGrindPattern {
     }
 
     /// Tries to open a file at path `path` and reads
-    /// it as a Cybergrind Patter.
+    /// it as a Cybergrind Pattern.
     pub fn parse_path<P: AsRef<Path>>(path: P) -> Result<CyberGrindPattern, IoError> {
         let mut file = File::open(path)?;
         Self::parse_file(&mut file)
