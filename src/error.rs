@@ -44,6 +44,17 @@ pub enum ParseErrorType {
     InvalidPrefab,
 }
 
+impl From<io::Error> for IoError {
+    fn from(value: io::Error) -> Self {
+        Self::Io(value)
+    }
+}
+impl From<ParseError> for IoError {
+    fn from(value: ParseError) -> Self {
+        Self::Parse(value)
+    }
+}
+
 impl Error for IoError {}
 impl Error for ParseError {}
 impl Error for ParseErrorType {}
