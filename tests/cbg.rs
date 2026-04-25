@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use tinycbg::*;
 
 #[test]
@@ -50,4 +52,13 @@ fn parse() {
         assert_eq!(pattern[i].height(), -50);
         assert_eq!(pattern[i].prefab(), Prefab::Melee);
     }
+}
+
+fn traits<T: Send + Sync + Debug + Clone + Default>() {}
+
+#[test]
+fn debug() {
+    traits::<CyberGrindPattern>();
+    println!("{:?}", CyberGrindPattern::new());
+    traits::<Tile>();
 }
