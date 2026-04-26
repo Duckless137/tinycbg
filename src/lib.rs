@@ -5,6 +5,7 @@ mod tile;
 pub use tile::Prefab;
 pub use tile::Tile;
 
+use std::fmt::Debug;
 use std::ops::Index;
 use std::ops::IndexMut;
 use std::ops::Range;
@@ -47,6 +48,89 @@ impl From<[Tile; 256]> for CyberGrindPattern {
 #[derive(Clone)]
 pub struct CyberGrindPattern {
     tiles: [Tile; 256],
+}
+
+const DBG_ROW_SIZE: usize = 16 * 4 + 6;
+const DBG_OFF: usize = 4;
+fn set_wrapper_bytes(arr: &mut [u8], row: usize) {
+    if row & 1 != 0 {
+        arr[row * DBG_ROW_SIZE + 1] = b'.';
+    } else {
+        arr[row * DBG_ROW_SIZE] = b' ';
+        arr[row * DBG_ROW_SIZE + 1] = b' ';
+    }
+    arr[row * DBG_ROW_SIZE + DBG_OFF - 2] = b'|';
+    arr[row * DBG_ROW_SIZE + DBG_OFF - 1] = b' ';
+    arr[row * DBG_ROW_SIZE + DBG_ROW_SIZE - 2] = b'|';
+    if row < 32 {
+        arr[row * DBG_ROW_SIZE + DBG_ROW_SIZE - 1] = b'\n';
+    }
+}
+
+fn to_hex_byte<N>(num: N) -> Option<u8>
+where
+    N: TryInto<u8>,
+{
+    let num = match num.try_into() {
+        Ok(n) => n,
+        Err(_) => return None,
+    };
+    match num {
+        0..10 => Some(num + b'0'),
+        10..16 => Some(num + b'a' - 10),
+        _ => None,
+    }
+}
+
+fn set_header(arr: &mut [u8]) {
+    let mut i = 0;
+    while i < DBG_OFF {
+        arr[i] = b' ';
+        i += 1;
+    }
+
+    for col in 0..16 {
+        arr[i] = to_hex_byte(col).expect("Col should be between 0..15");
+        arr[i + 1] = b'.';
+        arr[i + 2] = b' ';
+        arr[i + 3] = b' ';
+        i += 4;
+    }
+    arr[i] = b' ';
+    arr[i + 1] = b'\n';
+}
+
+impl Debug for CyberGrindPattern {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        const ARR_SIZE: usize = DBG_ROW_SIZE * 33 - 1;
+        let mut res: [u8; ARR_SIZE] = [b'0'; ARR_SIZE];
+        set_header(&mut res);
+        for row in 0..16 {
+            let row1 = row * 2 + 1;
+            let row2 = row * 2 + 2;
+            set_wrapper_bytes(&mut res, row1);
+            res[row1 * DBG_ROW_SIZE] = to_hex_byte(row).expect("Row should be between 0..15");
+            set_wrapper_bytes(&mut res, row2);
+            let mut i = 4;
+            for col in 0..16 {
+                let height = self[(col, row)].height();
+                for byte in format!("{height:03} ").as_bytes() {
+                    res[row1 * DBG_ROW_SIZE + i] = *byte;
+                    i += 1;
+                }
+            }
+            i = 4;
+            for col in 0..16 {
+                let pf = self[(col, row)].prefab();
+                for byte in format!("[{pf}] ").as_bytes() {
+                    res[row2 * DBG_ROW_SIZE + i] = *byte;
+                    i += 1;
+                }
+            }
+        }
+
+        f.write_str(str::from_utf8(&res).expect("WHY IS THIS NOT VALID UTF-8"))
+    }
 }
 
 /// An interface for building cybergrind patterns.
