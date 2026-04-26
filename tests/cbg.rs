@@ -55,10 +55,13 @@ fn parse() {
 }
 
 fn traits<T: Send + Sync + Debug + Clone + Default>() {}
-
 #[test]
 fn debug() {
     traits::<CyberGrindPattern>();
-    println!("{:?}", CyberGrindPattern::new());
+    let dbg_res = format!(
+        "{:?}",
+        CyberGrindPattern::parse_path("test.cgp").expect("Failed to parse cgp file")
+    );
+    print!("{}", dbg_res);
     traits::<Tile>();
 }
