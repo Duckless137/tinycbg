@@ -1,5 +1,5 @@
 use std::{
-    fmt::{Debug, Formatter, Result as FmtRes},
+    fmt::{Debug, Display, Formatter, Result as FmtRes},
     ops::{Add, Sub},
 };
 
@@ -27,16 +27,49 @@ pub enum Prefab {
     None,
 }
 
-impl From<Prefab> for u8 {
-    fn from(prefab: Prefab) -> Self {
-        match prefab {
-            Prefab::None => 0,
-            Prefab::Melee => 1,
-            Prefab::Projectile => 2,
-            Prefab::HideousMass => 3,
-            Prefab::JumpPad => 4,
-            Prefab::Stairs => 5,
+impl Prefab {
+    pub fn char(self) -> char {
+        self.into()
+    }
+    pub fn byte(self) -> u8 {
+        self.into()
+    }
+}
+
+impl From<Prefab> for char {
+    fn from(val: Prefab) -> char {
+        match val {
+            Prefab::HideousMass => 'H',
+            Prefab::Projectile => 'p',
+            Prefab::Melee => 'n',
+            Prefab::Stairs => 's',
+            Prefab::JumpPad => 'j',
+            Prefab::None => ' ',
         }
+    }
+}
+impl From<Prefab> for u8 {
+    fn from(val: Prefab) -> u8 {
+        match val {
+            Prefab::HideousMass => b'H',
+            Prefab::Projectile => b'p',
+            Prefab::Melee => b'n',
+            Prefab::Stairs => b's',
+            Prefab::JumpPad => b'j',
+            Prefab::None => b' ',
+        }
+    }
+}
+impl Display for Prefab {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtRes {
+        f.write_str(match self {
+            Prefab::HideousMass => "H",
+            Prefab::Projectile => "p",
+            Prefab::Melee => "n",
+            Prefab::Stairs => "s",
+            Prefab::JumpPad => "j",
+            Prefab::None => " ",
+        })
     }
 }
 
