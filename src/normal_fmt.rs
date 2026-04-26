@@ -53,16 +53,7 @@ impl CyberGrindPattern {
                 let tile = self.tiles[tile_idx];
                 let prefab = tile.prefab();
 
-                let char = match prefab {
-                    Prefab::None => b'0',
-                    Prefab::Melee => b'n',
-                    Prefab::Projectile => b'p',
-                    Prefab::HideousMass => b'H',
-                    Prefab::Stairs => b's',
-                    Prefab::JumpPad => b'J',
-                };
-
-                buf[buf_idx] = char;
+                buf[buf_idx] = prefab.byte();
                 buf_idx += 1;
 
                 tile_idx += 1;
