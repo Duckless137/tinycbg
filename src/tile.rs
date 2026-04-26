@@ -44,7 +44,7 @@ impl From<Prefab> for char {
             Prefab::Melee => 'n',
             Prefab::Stairs => 's',
             Prefab::JumpPad => 'j',
-            Prefab::None => ' ',
+            Prefab::None => '0',
         }
     }
 }
@@ -56,7 +56,7 @@ impl From<Prefab> for u8 {
             Prefab::Melee => b'n',
             Prefab::Stairs => b's',
             Prefab::JumpPad => b'j',
-            Prefab::None => b' ',
+            Prefab::None => b'0',
         }
     }
 }
@@ -68,7 +68,7 @@ impl Display for Prefab {
             Prefab::Melee => "n",
             Prefab::Stairs => "s",
             Prefab::JumpPad => "j",
-            Prefab::None => " ",
+            Prefab::None => "0",
         })
     }
 }
